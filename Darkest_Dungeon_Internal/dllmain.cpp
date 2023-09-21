@@ -18,27 +18,24 @@ DWORD WINAPI MainThread(HMODULE hModule)
 
     // Get base module
 
-    uintptr_t moduleBase = (uintptr_t)GetModuleHandle(L"darkest.exe");
+    //uintptr_t moduleBase = (uintptr_t)GetModuleHandle(L"darkest.exe");
     bool bStress = false, bPlayerHealth = false, bEnemyHealth = false;
 
-    //MODULEINFO mod_info = { 0 };
+    MODULEINFO mod_info = { 0 };
 
-    //if (moduleBase)
-    //{
-    //    GetModuleInformation(GetCurrentProcess(), moduleBase, &mod_info, sizeof(MODULEINFO));
-    //}
+    GetModuleInformation(GetCurrentProcess(), GetModuleHandle(L"darkest.exe"), &mod_info, sizeof(MODULEINFO));
 
-    //uintptr_t baseStart = (uintptr_t)mod_info.lpBaseOfDll;
-    //uintptr_t baseEnd = baseStart + mod_info.SizeOfImage;
+    uintptr_t baseStart = (uintptr_t)mod_info.lpBaseOfDll;
+    uintptr_t baseEnd = baseStart + mod_info.SizeOfImage;
 
-    //BYTE* stress_hook = (BYTE*)PatternScan((BYTE*)baseStart, baseEnd, 
-    //    "\xF3\x0F\x11\x8E\xE4\x0D\x00\x00\x38", "xxxxxxxxx");
+    BYTE* stress_hook = (BYTE*)PatternScan((char*)baseStart, baseEnd, 
+        "\xF3\x0F\x11\x8E\xE4\x0D\x00\x00\x38", "xxxxxxxxx");
 
-    //BYTE* player_health_hook = (BYTE*)PatternScan((BYTE*)baseStart, baseEnd, 
-    //    "\xF3\x0F\x5C\x45\x0C\xF3\x0F\x11\x86\xAC\x0C\x00\x00", "xxxxxxxxxxxxx");
+    BYTE* player_health_hook = (BYTE*)PatternScan((char*)baseStart, baseEnd, 
+        "\xF3\x0F\x5C\x45\x0C\xF3\x0F\x11\x86\xAC\x0C\x00\x00", "xxxxxxxxxxxxx");
 
-    //BYTE* enemy_health_hook = (BYTE*)PatternScan((BYTE*)baseStart, baseEnd, 
-    //    "\xF3\x0F\x5C\xC1\xF3\x0F\x11\x83\xAC\x0C\x00\x00", "xxxxxxxxxxxx");
+    BYTE* enemy_health_hook = (BYTE*)PatternScan((char*)baseStart, baseEnd, 
+        "\xF3\x0F\x5C\xC1\xF3\x0F\x11\x83\xAC\x0C\x00\x00", "xxxxxxxxxxxx");
 
     // Loop
 
@@ -52,7 +49,7 @@ DWORD WINAPI MainThread(HMODULE hModule)
         if (GetAsyncKeyState(VK_NUMPAD1) & 1)
         {
             bStress = !bStress; 
-            BYTE* stress_hook = (BYTE*)(moduleBase + 0x12B37F8);
+            //BYTE* stress_hook = (BYTE*)(moduleBase + 0x12B37F8);
             size_t bytes_to_erase = 8;
 
             if (bStress)
@@ -71,7 +68,7 @@ DWORD WINAPI MainThread(HMODULE hModule)
         if (GetAsyncKeyState(VK_NUMPAD2) & 1)
         {
             bPlayerHealth = !bPlayerHealth;
-            BYTE* player_health_hook = (BYTE*)(moduleBase + 0x12B6438);
+            //BYTE* player_health_hook = (BYTE*)(moduleBase + 0x12B6438);
             size_t bytes_to_erase = 5;
 
             if (bPlayerHealth)
@@ -90,7 +87,7 @@ DWORD WINAPI MainThread(HMODULE hModule)
         if (GetAsyncKeyState(VK_NUMPAD3) & 1)
         {
             bEnemyHealth = !bEnemyHealth;
-            BYTE* enemy_health_hook = (BYTE*)(moduleBase + 0x14522A5);
+            //BYTE* enemy_health_hook = (BYTE*)(moduleBase + 0x14522A5);
             size_t bytes_to_erase = 12;
 
             if (bEnemyHealth)

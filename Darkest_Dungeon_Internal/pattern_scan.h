@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-void* PatternScan(BYTE* base, size_t size, const char* pattern, const char* mask);
+void* PatternScan(char* base, size_t size, const char* pattern, const char* mask);
 
 void* PatternScanEx(HANDLE hProcess, uintptr_t begin, uintptr_t end, char* pattern, char* mask);
 

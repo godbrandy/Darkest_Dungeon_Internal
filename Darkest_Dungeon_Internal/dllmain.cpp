@@ -16,18 +16,20 @@ DWORD WINAPI MainThread(HMODULE hModule)
     freopen_s(&file, "CONOUT$", "w", stdout);
     std::cout << "DLL injected successfully.\n";
 
-    // Get base module
-
-    //uintptr_t moduleBase = (uintptr_t)GetModuleHandle(L"darkest.exe");
-    bool bStress = false, bPlayerHealth = false, bEnemyHealth = false;
-
+    // Get module information
     MODULEINFO mod_info = { 0 };
+    HMODULE mod_handle = GetModuleHandle(L"darkest.exe");
 
-    GetModuleInformation(GetCurrentProcess(), GetModuleHandle(L"darkest.exe"), &mod_info, sizeof(MODULEINFO));
+    if (mod_handle)
+    {
+        GetModuleInformation(GetCurrentProcess(), mod_handle, &mod_info, sizeof(MODULEINFO));
+    }
 
+    // Find the start and end of the module for the pattern scanning
     uintptr_t baseStart = (uintptr_t)mod_info.lpBaseOfDll;
     uintptr_t baseEnd = baseStart + mod_info.SizeOfImage;
 
+    // Look for patterns and find the correspoding address
     BYTE* stress_hook = (BYTE*)PatternScan((char*)baseStart, baseEnd, 
         "\xF3\x0F\x11\x8E\xE4\x0D\x00\x00\x38", "xxxxxxxxx");
 
@@ -36,6 +38,9 @@ DWORD WINAPI MainThread(HMODULE hModule)
 
     BYTE* enemy_health_hook = (BYTE*)PatternScan((char*)baseStart, baseEnd, 
         "\xF3\x0F\x5C\xC1\xF3\x0F\x11\x83\xAC\x0C\x00\x00", "xxxxxxxxxxxx");
+
+    // Declare bool variables for the activation of the cheats
+    bool bStress = false, bPlayerHealth = false, bEnemyHealth = false;
 
     // Loop
 
@@ -49,7 +54,6 @@ DWORD WINAPI MainThread(HMODULE hModule)
         if (GetAsyncKeyState(VK_NUMPAD1) & 1)
         {
             bStress = !bStress; 
-            //BYTE* stress_hook = (BYTE*)(moduleBase + 0x12B37F8);
             size_t bytes_to_erase = 8;
 
             if (bStress)
@@ -68,7 +72,6 @@ DWORD WINAPI MainThread(HMODULE hModule)
         if (GetAsyncKeyState(VK_NUMPAD2) & 1)
         {
             bPlayerHealth = !bPlayerHealth;
-            //BYTE* player_health_hook = (BYTE*)(moduleBase + 0x12B6438);
             size_t bytes_to_erase = 5;
 
             if (bPlayerHealth)
@@ -87,7 +90,6 @@ DWORD WINAPI MainThread(HMODULE hModule)
         if (GetAsyncKeyState(VK_NUMPAD3) & 1)
         {
             bEnemyHealth = !bEnemyHealth;
-            //BYTE* enemy_health_hook = (BYTE*)(moduleBase + 0x14522A5);
             size_t bytes_to_erase = 12;
 
             if (bEnemyHealth)
